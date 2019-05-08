@@ -15,7 +15,6 @@
       (with-meta 
         (apply 
           (fn [a# b# & data1#]
-            (println "Calling: " ~fk)
             (if (not (and a# b# (~fk ~desc)))
               ~default
               (apply (~fk ~desc) a# b# data1#)))

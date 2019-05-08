@@ -234,8 +234,6 @@
      (ulmus/merge
        (ulmus/signal-of (fn [] (or (:initial-state props) initial-state)))
        (ulmus/map (fn [[[from to] connection from-data to-data]]
-                    (println "CONNECTION:" connection)
-                    (println (meta from))
                     (fn [state]
                       (let [[connected-from connected-to] ((:connect connection)
                                                            (vary-meta from assoc :data from-data)

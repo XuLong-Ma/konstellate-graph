@@ -62,7 +62,6 @@
    :to ["PodSpec" "Pod"]
    :desc "A key/value in this ConfigMap or Secret's data will be exposed as an enivronment variable in one of the pods containers."
    :connect (fn [config pod]
-              (println "Meta:" (meta config))
               [config (update-in (:outer (meta pod))
                                  (concat (:path-to-inner (meta pod))
                                          [:containers (:data (meta pod))])
