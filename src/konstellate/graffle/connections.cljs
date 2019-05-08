@@ -21,7 +21,7 @@
     outer
     (if-let [path-to-inner (get (paths inner) (:kind outer))]
       (with-meta 
-        (get-in outer path-to-inner)
+        (get-in outer path-to-inner {})
         (assoc (meta outer)
                :path-to-inner path-to-inner
                :outer outer)))))

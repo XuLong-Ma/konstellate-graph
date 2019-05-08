@@ -42,11 +42,12 @@
             ((:recurrent/dom-$ sources) ".node" "click")))
 
         selected-relation-id-$
-        (ulmus/map
-          get-id-fn
-          (ulmus/merge
-            ((:recurrent/dom-$ sources) ".relationship-click-target" "mousedown")
-            ((:recurrent/dom-$ sources) ".relationship-click-target" "click")))
+        (ulmus/remove #(= % :connection-line)
+          (ulmus/map
+            get-id-fn
+            (ulmus/merge
+              ((:recurrent/dom-$ sources) ".relationship-click-target" "mousedown")
+              ((:recurrent/dom-$ sources) ".relationship-click-target" "click"))))
 
         selected-nodes-$ 
         (ulmus/merge
@@ -142,8 +143,7 @@
                                          from ((:from c) @nodes-$)
                                          to ((:to c) @nodes-$)]
                                      [id (components/RelationshipLine
-                                           {:id id
-                                            :connection c}
+                                           {:connection c}
                                            {:selected-relations-$ selected-relations-$
                                             :from-pos-$ (:position-$ from)
                                             :to-pos-$ (:position-$ to)})]))
@@ -176,6 +176,7 @@
                           (constantly {:type :break})
                           ((:recurrent/dom-$ sources) :root "mouseup"))
                         (ulmus/pickmerge :connect-$ (ulmus/distinct (ulmus/map vals nodes-$)))))
+
     connection-requests-$ (ulmus/pickmerge :connect-$ (ulmus/distinct (ulmus/map vals nodes-$)))
 
     valid-connections-$ 
@@ -202,10 +203,12 @@
     (ulmus/merge
       (ulmus/map
         (constantly false)
-        (:connect-$ modal))
+        (ulmus/merge
+          (:connect-$ modal)
+          (:close-$ modal)))
       (ulmus/map
         (constantly true)
-        (ulmus/filter #(not (empty? %)) (:connectable-kvs-$ modal))))]
+        (ulmus/remove empty? valid-connections-$)))]
 
     {:connections-requests-$ (ulmus/pickmerge :connect-$ (ulmus/distinct (ulmus/map vals nodes-$)))
      :selected-nodes-$ (ulmus/start-with! #{} selected-nodes-$)
@@ -232,7 +235,7 @@
                             (ulmus/pickzip :recurrent/dom-$ (ulmus/map vals lines-$)))))
      :recurrent/state-$ 
      (ulmus/merge
-       (ulmus/signal-of (fn [] (or (:initial-state props) initial-state)))
+       ;(ulmus/signal-of (fn [] (or (:initial-state props) initial-state)))
        (ulmus/map (fn [[[from to] connection from-data to-data]]
                     (fn [state]
                       (let [[connected-from connected-to] ((:connect connection)

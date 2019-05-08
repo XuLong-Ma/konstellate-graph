@@ -59,7 +59,7 @@
                            (let [selected? (some #{(:id props)} selected)
                                  deselected? (and (not selected?)
                                                   (not (empty? selected)))]
-                             [:div {:id (name (:id props))
+                             [:div {:id (name (or (:id props) ""))
                                     :class (str "node "
                                                 (if selected? "selected ")
                                                 (if deselected? "deselected"))
@@ -98,7 +98,7 @@
                      :x1 x1 :y1 y1 :x2 x2 :y2 y2
                      :stroke (if selected? "#00a2ff" "#838383")
                      :stroke-width (if selected? 4 2)}]
-                   [:line {:id connection-hash
+                   [:line {:id (or (:id props) connection-hash)
                            :class "relationship-click-target"
                            :x1 x1 :y1 y1 :x2 x2 :y2 y2
                            :stroke "transparent"
@@ -184,7 +184,7 @@
                          [:div {:class "picker"}
                           from-select
                           to-select]
-                         [:p {} message]]
+                         [:p {} (if (not (empty? message)) message "There are no available conections for the selected resources.")]]
                        [:div {:class "banner"}
                         [:div {:class "connect button primary"}
                          "Connect"]]])
@@ -204,11 +204,13 @@
           ((:recurrent/dom-$ sources)
            ".button.connect" "click"))]
 
-    {:connect-$ connect-$
+    {:close-$ ((:recurrent/dom-$ sources) ".close" "click")
+     :connect-$ connect-$
      :connectable-kvs-$ connectable-kvs-$
      :recurrent/dom-$ (ulmus/map (fn [content]
                                    [:div {:class "modal-underlay"}
                                     [:div {:class "modal"}
+                                     [:div {:class "close"} "x"]
                                      [:h1 {} ""]
                                      content]])
                                  content-$)}))
